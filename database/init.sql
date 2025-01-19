@@ -12,6 +12,7 @@ create table Site
 (
 	id integer primary key,
 	link text not null,
+	size_in_bytes int not null check(size_in_bytes > 0),
 	--title text not null,
 	--category text not null,
 	--comment_count int not null check(comment_count > 0),
