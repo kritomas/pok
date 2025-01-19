@@ -1,5 +1,8 @@
 -- This is a crawling schema for sqlite.
 
+PRAGMA encoding = 'UTF-8';
+PRAGMA journal_mode = WAL;
+
 begin transaction;
 
 create table Links_To_Check

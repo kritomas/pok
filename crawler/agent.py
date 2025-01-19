@@ -11,3 +11,7 @@ class Agent(multiprocessing.Process):
 	def run(self):
 		self.connection = dbctl.DBConnection()
 		self.log("Initialized")
+		url = True
+		while url != None:
+			url = self.connection.nextURL()
+			self.log(str(url))
