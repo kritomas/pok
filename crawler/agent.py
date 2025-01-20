@@ -16,9 +16,19 @@ class Agent(multiprocessing.Process):
 	def log(self, what):
 		print ("Agent " + str(self._agent_id) + ": " + what)
 
+	def scannable(self, link):
+		if not link:
+			return False
+		scannable = False
+
+		scannable |= ("/zpravy/" in link)
+
+		return scannable
+
 	def processNextLink(self, link):
 		next = urllib.parse.urljoin(self.connection.baseUrl(), link)
-		self.connection.addLink(next)
+		if self.scannable(next):
+			self.connection.addLink(next)
 
 	def run(self):
 		signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -26,13 +36,16 @@ class Agent(multiprocessing.Process):
 		self.connection = dbctl.DBConnection()
 		self.log("Initialized")
 		while self.connection.active():
-			currentLink = self.connection.nextLink()
-			if currentLink == None:
-				currentLink = self.connection.baseUrl()
-			if not self.connection.alreadyCrawled(currentLink):
-				response = requests.get(currentLink, cookies=_cookies)
-				self.connection.addCrawl(currentLink, response.text)
-				soup = bs4.BeautifulSoup(response.text, "html.parser")
-				for next in soup.find_all("a", href=True):
-					self.processNextLink(next["href"])
+			try:
+				currentLink = self.connection.nextLink()
+				if currentLink == None:
+					currentLink = self.connection.baseUrl()
+				if not self.connection.alreadyCrawled(currentLink):
+					response = requests.get(currentLink, cookies=_cookies)
+					self.connection.addCrawl(currentLink, response.text)
+					soup = bs4.BeautifulSoup(response.text, "html.parser")
+					for next in soup.find_all("a", href=True):
+						self.processNextLink(next["href"])
+			except Exception as error:
+				self.log("Error: " + error)
 		self.log("Terminating")
