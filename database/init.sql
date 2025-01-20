@@ -8,14 +8,14 @@ begin transaction;
 create table Links_To_Check
 (
 	id integer primary key,
-	link text not null
+	link text unique not null
 ) strict;
 
 create table Site
 (
 	id integer primary key,
 	link text not null,
-	size_in_bytes int not null check(size_in_bytes > 0),
+	size int not null check(size > 0),
 	--title text not null,
 	--category text not null,
 	--comment_count int not null check(comment_count > 0),
@@ -29,7 +29,8 @@ create table Controller -- Used to control agents
 (
 	id integer primary key,
 	is_active integer not null default 0,
-	is_ready integer not null default 0
+	is_ready integer not null default 0,
+	base_url text not null default 'https://www.idnes.cz'
 ) strict;
 
 insert into Controller default values;

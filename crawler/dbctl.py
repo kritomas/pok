@@ -48,7 +48,13 @@ class DBConnection:
 			if res[0] != 1:
 				raise Exception("DB not properly initialized")
 
-	def nextURL(self):
+	def active(self):
+		with DBContext() as cursor:
+			cursor.execute("select is_active from Controller;")
+			row = cursor.fetchone()
+			return row[0] != 0
+
+	def nextLink(self):
 		with DBContext() as cursor:
 			cursor.execute("begin transaction;")
 			cursor.execute("select id, link from Links_To_Check order by id asc limit 1;")
@@ -59,3 +65,28 @@ class DBConnection:
 			if row == None:
 				return None
 			return row[1]
+
+	def alreadyCrawled(self, link):
+		with DBContext() as cursor:
+			cursor.execute("select link from Site where link=?;", (link,))
+			row = cursor.fetchone()
+			return row != None
+	def toBeCrawled(self, link):
+		with DBContext() as cursor:
+			cursor.execute("select link from Links_To_Check where link=?;", (link,))
+			row = cursor.fetchone()
+			return row != None
+	def baseUrl(self):
+		with DBContext() as cursor:
+			cursor.execute("select base_url from Controller;")
+			row = cursor.fetchone()
+			return row[0]
+
+	def addLink(self, link):
+		if not self.toBeCrawled(link):
+			with DBContext() as cursor:
+				cursor.execute("insert into Links_To_Check (link) values (?);", (link,))
+	def addCrawl(self, link, html):
+		if not self.alreadyCrawled(link):
+			with DBContext() as cursor:
+				cursor.execute("insert into Site (link, size, original_html) values (?, ?, ?);", (link, len(html), html))
