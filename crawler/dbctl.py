@@ -96,11 +96,11 @@ class DBConnection:
 			if row == None:
 				cursor.execute("insert into Links_To_Check (link) values (?);", (link,))
 			cursor.execute("commit;")
-	def addCrawl(self, link, html):
+	def addCrawl(self, link, html, object):
 		with DBContext() as cursor:
 			cursor.execute("begin transaction;")
 			cursor.execute("select link from Site where link=?;", (link,))
 			row = cursor.fetchone()
 			if row == None:
-				cursor.execute("insert into Site (link, size, original_html) values (?, ?, ?);", (link, len(html), html))
+				cursor.execute("insert into Site (link, original_size, title, content, creation_date, photo_count) values (?, ?, ?, ?, ?, ?);", (link, len(html), object["title"], object["content"], object["date"], object["photo_count"]))
 			cursor.execute("commit;")

@@ -1,5 +1,5 @@
 import multiprocessing, urllib.parse, signal
-import requests, bs4
+import requests, bs4, sqlite3
 import dbctl
 
 _cookies = {
@@ -21,7 +21,7 @@ class Agent(multiprocessing.Process):
 			return False
 		scannable = False
 
-		scannable |= ("/zpravy/" in link)
+		scannable |=("/zpravy/" in link and not "/foto" in link)
 
 		return scannable
 
@@ -29,6 +29,30 @@ class Agent(multiprocessing.Process):
 		next = urllib.parse.urljoin(self.connection.baseUrl(), link)
 		if self.scannable(next):
 			self.connection.addLink(next)
+
+	def parseSoup(self, soup):
+		title = soup.find("meta", attrs={"property":"og:title"})
+		if title:
+			title = title["content"]
+
+		content = None
+		article_body = soup.find("div", attrs={"id":"art-text"})
+		if article_body:
+			content = "\n".join([p.get_text(strip=True) for p in soup.find("div", attrs={"id":"art-text"}).find_all("p")])
+
+		date = soup.find("meta", attrs={"property":"article:published_time"})
+		if date:
+			date = date["content"]
+
+		photo_count = len(soup.find_all('img'))
+
+
+		return {
+			"title": title,
+			"content": content,
+			"date": date,
+			"photo_count": photo_count
+		}
 
 	def run(self):
 		signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -42,10 +66,12 @@ class Agent(multiprocessing.Process):
 					currentLink = self.connection.baseUrl()
 				if not self.connection.alreadyCrawled(currentLink):
 					response = requests.get(currentLink, cookies=_cookies)
-					self.connection.addCrawl(currentLink, response.text)
 					soup = bs4.BeautifulSoup(response.text, "html.parser")
 					for next in soup.find_all("a", href=True):
 						self.processNextLink(next["href"])
+					self.connection.addCrawl(currentLink, response.text, self.parseSoup(soup))
+			except sqlite3.IntegrityError as error:
+				self.log("SQLite integrity violation: " + str(error))
 			except Exception as error:
-				self.log("Error: " + error)
+				self.log("Exception: " + str(error))
 		self.log("Terminating")

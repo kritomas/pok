@@ -15,13 +15,13 @@ create table Site
 (
 	id integer primary key,
 	link text unique not null,
-	size int not null check(size >= 0),
-	--title text not null,
+	original_size int not null check(original_size >= 0),
+	title text not null,
 	--category text not null,
-	--comment_count int not null check(comment_count > 0),
-	--photo_count int not null check(photo_count > 0),
-	--contents text not null,
-	--creation_date text not null,
+	content text not null,
+	creation_date text,
+	--comment_count int check(comment_count > 0),
+	photo_count int check(photo_count > 0),
 	original_html text
 ) strict;
 
