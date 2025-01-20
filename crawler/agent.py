@@ -1,4 +1,4 @@
-import multiprocessing, urllib.parse
+import multiprocessing, urllib.parse, signal
 import requests, bs4
 import dbctl
 
@@ -21,6 +21,8 @@ class Agent(multiprocessing.Process):
 		self.connection.addLink(next)
 
 	def run(self):
+		signal.signal(signal.SIGINT, signal.SIG_IGN)
+		signal.signal(signal.SIGTERM, signal.SIG_IGN)
 		self.connection = dbctl.DBConnection()
 		self.log("Initialized")
 		while self.connection.active():
@@ -30,7 +32,7 @@ class Agent(multiprocessing.Process):
 			if not self.connection.alreadyCrawled(currentLink):
 				response = requests.get(currentLink, cookies=_cookies)
 				self.connection.addCrawl(currentLink, response.text)
-				soup = bs4.BeautifulSoup(response.text)
-				#self.log(response.text)
+				soup = bs4.BeautifulSoup(response.text, "html.parser")
 				for next in soup.find_all("a", href=True):
 					self.processNextLink(next["href"])
+		self.log("Terminating")

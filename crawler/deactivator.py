@@ -1,14 +1,16 @@
 import multiprocessing, signal
 import dbctl
 
-class Master(multiprocessing.Process):
+class Deactivator(multiprocessing.Process):
 	def __init__(self):
 		super().__init__()
 
 	def log(self, what):
-		print ("Master: " + what)
+		print ("Deactivator: " + what)
+
 	def run(self):
 		signal.signal(signal.SIGINT, signal.SIG_IGN)
 		signal.signal(signal.SIGTERM, signal.SIG_IGN)
 		self.connection = dbctl.DBController()
-		self.log("Initialized")
+		self.connection.deactivate()
+		self.log("DB closed, agents terminating")

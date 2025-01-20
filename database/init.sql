@@ -14,7 +14,7 @@ create table Links_To_Check
 create table Site
 (
 	id integer primary key,
-	link text not null,
+	link text unique not null,
 	size int not null check(size > 0),
 	--title text not null,
 	--category text not null,
