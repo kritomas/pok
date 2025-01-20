@@ -89,10 +89,18 @@ class DBConnection:
 			return row[0]
 
 	def addLink(self, link):
-		if not self.toBeCrawled(link):
-			with DBContext() as cursor:
+		with DBContext() as cursor:
+			cursor.execute("begin transaction;")
+			cursor.execute("select link from Links_To_Check where link=?;", (link,))
+			row = cursor.fetchone()
+			if row == None:
 				cursor.execute("insert into Links_To_Check (link) values (?);", (link,))
+			cursor.execute("commit;")
 	def addCrawl(self, link, html):
-		if not self.alreadyCrawled(link):
-			with DBContext() as cursor:
+		with DBContext() as cursor:
+			cursor.execute("begin transaction;")
+			cursor.execute("select link from Site where link=?;", (link,))
+			row = cursor.fetchone()
+			if row == None:
 				cursor.execute("insert into Site (link, size, original_html) values (?, ?, ?);", (link, len(html), html))
+			cursor.execute("commit;")
