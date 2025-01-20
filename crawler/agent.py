@@ -23,13 +23,14 @@ class Agent(multiprocessing.Process):
 	def run(self):
 		self.connection = dbctl.DBConnection()
 		self.log("Initialized")
-		currentLink = self.connection.nextLink()
-		while currentLink != None:
+		while self.connection.active():
+			currentLink = self.connection.nextLink()
+			if currentLink == None:
+				currentLink = self.connection.baseUrl()
 			if not self.connection.alreadyCrawled(currentLink):
 				response = requests.get(currentLink, cookies=_cookies)
-				self.connection.addCrawl(currentLink, response)
-				soup = bs4.BeautifulSoup(response)
+				self.connection.addCrawl(currentLink, response.text)
+				soup = bs4.BeautifulSoup(response.text)
+				#self.log(response.text)
 				for next in soup.find_all("a", href=True):
 					self.processNextLink(next["href"])
-
-			currentLink = self.connection.nextLink(currentLink)

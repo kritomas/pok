@@ -9,4 +9,5 @@ class Master(multiprocessing.Process):
 		print ("Master: " + what)
 	def run(self):
 		self.connection = dbctl.DBController()
+		self.connection.activate()
 		self.log("Initialized")

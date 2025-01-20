@@ -37,6 +37,12 @@ class DBController:
 			sql = file.read()
 			with DBContext() as cursor:
 				cursor.executescript(sql)
+	def activate(self):
+		with DBContext() as cursor:
+			cursor.execute("update Controller set is_active=1;")
+	def deactivate(self):
+		with DBContext() as cursor:
+			cursor.execute("update Controller set is_active=0;")
 
 class DBConnection:
 	def __init__(self):
