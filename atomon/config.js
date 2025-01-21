@@ -53,3 +53,5 @@ if (conf.crawler.crawl_milestone <= 0)
 {
 	throw new Error("Config entry crawler.crawl_milestone must be positive");
 }
+
+conf.crawler.crawl_milestone = Math.round(conf.crawler.critical_db_size * 1024 * 1024)

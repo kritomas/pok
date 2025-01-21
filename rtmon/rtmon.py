@@ -49,7 +49,7 @@ class DBContext:
 class DBConnection:
 	def totalCrawledSize(self):
 		with DBContext() as cursor:
-			cursor.execute("select sum(original_size) from Site;")
+			cursor.execute("select sum(original_size) as total from Site;")
 			row = cursor.fetchone()
 			return row[0]
 
