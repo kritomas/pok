@@ -59,28 +59,47 @@ def bToMb(b):
 	return "{:.2f}".format(b / (1024 * 1024)) + "MB"
 
 def main():
-	print("Pok Realtime Monitor")
+	print("Pok Realtime Monitor\n")
 	try:
-		while True:
+		dbFileSize = os.path.getsize(conf["db"]["db_path"])
+		do = True
+		while do or dbFileSize < conf["crawler"]["critical_db_size"]:
+			do = False
 			totalCrawled = dbcon.totalCrawledSize()
 			dbFileSize = os.path.getsize(conf["db"]["db_path"])
 
-			print("\r\33[J", end="")
+			print("\33[0m\r\33[J", end="")
 
+			print("\33[37m", end="")
 			fraction = totalCrawled / conf["crawler"]["crawl_milestone"]
-			print("Crawl milestone: " + bToMb(totalCrawled) + " (" + str(int(fraction * 100)) + "%)")
+			print("Crawl milestone: ", end="")
+			if fraction >= 1:
+				print("\33[32m", end="")
+			print(bToMb(totalCrawled) + " (" + str(int(fraction * 100)) + "%)")
 
+			print("\33[37m", end="")
 			fraction = dbFileSize / conf["crawler"]["db_size_milestone"]
-			print("DB file milestone: " + bToMb(dbFileSize) + " (" + str(int(fraction * 100)) + "%)")
+			print("DB file milestone: ", end="")
+			if fraction >= 1:
+				print("\33[32m", end="")
+			print(bToMb(dbFileSize) + " (" + str(int(fraction * 100)) + "%)")
 
+			print("\33[37m", end="")
+			print()
 			fraction = dbFileSize / conf["crawler"]["critical_db_size"]
-			print("DB file critical limit: " + bToMb(dbFileSize) + " (" + str(int(fraction * 100)) + "%)")
+			print("DB file critical limit: ", end="")
+			if fraction >= 1:
+				print("\33[32m", end="")
+			print(bToMb(dbFileSize) + " (" + str(int(fraction * 100)) + "%)")
 
 			sys.stdout.flush()
-			time.sleep(3)
-			print("\33[3A", end="")
+			if dbFileSize < conf["crawler"]["critical_db_size"]:
+				time.sleep(3)
+				print("\33[4A", end="")
+		print()
+		print("\33[32mCritical target reached, Pok terminating ;)")
 	except KeyboardInterrupt:
 		pass
-	print("Exiting Pok Realtime Monitor")
+	print("\33[0mExiting Pok Realtime Monitor")
 
 main()
