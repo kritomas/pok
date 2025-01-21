@@ -44,6 +44,10 @@ class Agent(multiprocessing.Process):
 		if date:
 			date = date["content"]
 
+		category = soup.find("meta", attrs={"name":"cXenseParse:qiw-rubrika"})
+		if category:
+			category = category["content"]
+
 		comment_count = soup.find("a", attrs={"class": "artsum-btn ico-discusion"})
 		if comment_count:
 			comment_count = comment_count.find("span")
@@ -57,6 +61,7 @@ class Agent(multiprocessing.Process):
 			"title": title,
 			"content": content,
 			"date": date,
+			"category": category,
 			"comment_count": comment_count,
 			"photo_count": photo_count
 		}

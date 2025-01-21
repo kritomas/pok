@@ -102,7 +102,7 @@ class DBConnection:
 			cursor.execute("select link from Site where link=?;", (link,))
 			row = cursor.fetchone()
 			if row == None:
-				cursor.execute("insert into Site (link, original_html, original_size, title, content, creation_date, comment_count, photo_count) values (?, ?, ?, ?, ?, ?, ?, ?);", (link, html, len(html), object["title"], object["content"], object["date"], object["comment_count"], object["photo_count"]))
+				cursor.execute("insert into Site (link, original_html, original_size, title, content, creation_date, category, comment_count, photo_count) values (?, ?, ?, ?, ?, ?, ?, ?, ?);", (link, html, len(html), object["title"], object["content"], object["date"], object["category"], object["comment_count"], object["photo_count"]))
 			cursor.execute("commit;")
 	def addCrawlHtmlOnly(self, link, html):
 		with DBContext() as cursor:
