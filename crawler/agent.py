@@ -21,14 +21,14 @@ class Agent(multiprocessing.Process):
 			return False
 		scannable = False
 
-		scannable |=("/zpravy/" in link and not "/foto" in link)
+		scannable |= (("/zpravy/" in link and not "/foto" in link) or ("_metro-" in link) or ("_ln_") in link)
 
 		return scannable
 
 	def processNextLink(self, link):
 		next = urllib.parse.urljoin(self.connection.baseUrl(), link)
-		if self.scannable(next):
-			self.connection.addLink(next)
+		#if self.scannable(next):
+		self.connection.addLink(next)
 
 	def parseSoup(self, soup):
 		title = soup.find("meta", attrs={"property":"og:title"})
@@ -44,6 +44,12 @@ class Agent(multiprocessing.Process):
 		if date:
 			date = date["content"]
 
+		comment_count = soup.find("a", attrs={"class": "artsum-btn ico-discusion"})
+		if comment_count:
+			comment_count = comment_count.find("span")
+			comment_count = comment_count.text
+			comment_count = int(comment_count.split(" ")[0][1:])
+
 		photo_count = len(soup.find_all('img'))
 
 
@@ -51,6 +57,7 @@ class Agent(multiprocessing.Process):
 			"title": title,
 			"content": content,
 			"date": date,
+			"comment_count": comment_count,
 			"photo_count": photo_count
 		}
 
@@ -60,18 +67,19 @@ class Agent(multiprocessing.Process):
 		self.connection = dbctl.DBConnection()
 		self.log("Initialized")
 		while self.connection.active():
+			currentLink = self.connection.nextLink()
+			if currentLink == None:
+				currentLink = self.connection.baseUrl()
 			try:
-				currentLink = self.connection.nextLink()
-				if currentLink == None:
-					currentLink = self.connection.baseUrl()
 				if not self.connection.alreadyCrawled(currentLink):
 					response = requests.get(currentLink, cookies=_cookies)
 					soup = bs4.BeautifulSoup(response.text, "html.parser")
 					for next in soup.find_all("a", href=True):
 						self.processNextLink(next["href"])
 					self.connection.addCrawl(currentLink, response.text, self.parseSoup(soup))
+					#self.connection.addCrawlHtmlOnly(currentLink, response.text)
 			except sqlite3.IntegrityError as error:
-				self.log("SQLite integrity violation: " + str(error))
+				self.log("SQLite integrity violation for '" + currentLink + "': " + str(error))
 			except Exception as error:
 				self.log("Exception: " + str(error))
 		self.log("Terminating")

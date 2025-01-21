@@ -17,11 +17,11 @@ create table Site
 	link text unique not null,
 	original_size int not null check(original_size >= 0),
 	title text not null,
-	--category text not null,
+	--category text,
 	content text not null,
 	creation_date text,
-	--comment_count int check(comment_count > 0),
-	photo_count int check(photo_count > 0),
+	comment_count int check(comment_count >= 0),
+	photo_count int check(photo_count >= 0),
 	original_html text
 ) strict;
 
