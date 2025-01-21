@@ -1,15 +1,12 @@
 import sqlite3, os, multiprocessing
 import config
 
-DB_PATH = "pok.db"
-DB_INIT_PATH = "database/init.sql"
-
 _dblock = multiprocessing.Lock()
 
 class DBContext:
 	def __enter__(self):
 		_dblock.acquire() # TODO Maybe only acquire for writes
-		self.connection = sqlite3.connect(DB_PATH, timeout=500)
+		self.connection = sqlite3.connect(config.conf["db"]["db_path"], timeout=500)
 		self.cursor = self.connection.cursor()
 		return self.cursor
 	def __exit__(self, exc_type, exc_value, traceback):
@@ -33,8 +30,8 @@ class DBController:
 		"""
 		Resets the database. THIS WILL WIPE ALL DATA.
 		"""
-		os.remove(DB_PATH)
-		with open(DB_INIT_PATH) as file:
+		os.remove(config.conf["db"]["db_path"])
+		with open(config.conf["db"]["schema_path"]) as file:
 			sql = file.read()
 			with DBContext() as cursor:
 				cursor.executescript(sql)
