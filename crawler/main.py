@@ -34,8 +34,9 @@ except SigTermException:
 	log("Caught SIGTERM, terminating")
 dea = deactivator.Deactivator()
 dea.start()
-dea.join()
 signal.signal(signal.SIGINT, signal.SIG_IGN)
+signal.signal(signal.SIGTERM, signal.SIG_IGN)
+dea.join()
 log("Waiting for agents to terminate")
 for a in agents:
 	a.join()

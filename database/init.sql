@@ -11,6 +11,8 @@ create table Links_To_Check
 	link text unique not null
 ) strict;
 
+create unique index Links_To_Check_Index on Links_To_Check(link);
+
 create table Site
 (
 	id integer primary key,
@@ -24,6 +26,8 @@ create table Site
 	photo_count int check(photo_count >= 0),
 	original_html text
 ) strict;
+
+create unique index Links_Site_Index on Site(link);
 
 create table Controller -- Used to control agents
 (
