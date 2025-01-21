@@ -1,5 +1,5 @@
 import signal
-import dbctl, agent, master, activator, deactivator
+import config, dbctl, agent, master, activator, deactivator
 
 class SigTermException(Exception):
 	pass
@@ -16,7 +16,7 @@ ctl.start()
 
 agents = []
 
-for i in range(8):
+for i in range(config.conf["crawler"]["processes"]):
 	agents.append(agent.Agent(i))
 for a in agents:
 	a.start()
@@ -25,7 +25,8 @@ def log(what):
 	print("Main process: " + what)
 
 try:
-	while True:
+	connection = dbctl.DBController()
+	while connection.active():
 		pass
 except KeyboardInterrupt:
 	log("Caught SIGINT, terminating")

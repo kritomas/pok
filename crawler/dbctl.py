@@ -1,4 +1,5 @@
 import sqlite3, os, multiprocessing
+import config
 
 DB_PATH = "pok.db"
 DB_INIT_PATH = "database/init.sql"
@@ -37,6 +38,11 @@ class DBController:
 			sql = file.read()
 			with DBContext() as cursor:
 				cursor.executescript(sql)
+	def active(self):
+		with DBContext() as cursor:
+			cursor.execute("select is_active from Controller;")
+			row = cursor.fetchone()
+			return row[0] != 0
 	def activate(self):
 		with DBContext() as cursor:
 			cursor.execute("update Controller set is_active=1;")
@@ -102,7 +108,7 @@ class DBConnection:
 			cursor.execute("select link from Site where link=?;", (link,))
 			row = cursor.fetchone()
 			if row == None:
-				cursor.execute("insert into Site (link, original_html, original_size, title, content, creation_date, category, comment_count, photo_count) values (?, ?, ?, ?, ?, ?, ?, ?, ?);", (link, html, len(html), object["title"], object["content"], object["date"], object["category"], object["comment_count"], object["photo_count"]))
+				cursor.execute("insert into Site (link, original_html, original_size, title, content, creation_date, category, comment_count, photo_count) values (?, ?, ?, ?, ?, ?, ?, ?, ?);", (link, (html if config.conf["crawler"]["save_html"] else None), len(html), object["title"], object["content"], object["date"], object["category"], object["comment_count"], object["photo_count"]))
 			cursor.execute("commit;")
 	def addCrawlHtmlOnly(self, link, html):
 		with DBContext() as cursor:
