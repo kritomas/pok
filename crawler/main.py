@@ -11,8 +11,8 @@ act = activator.Activator()
 act.start()
 act.join()
 
-ctl = master.Master()
-ctl.start()
+m = master.Master()
+m.start()
 
 agents = []
 
@@ -40,3 +40,4 @@ dea.join()
 log("Waiting for agents to terminate")
 for a in agents:
 	a.join()
+m.join()
