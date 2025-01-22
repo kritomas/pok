@@ -60,11 +60,11 @@ Create `/usr/local/etc/pok.json` with the following format:
 		"schema_path": "[Path to the DB init script (wherever you copy database/init.sql to)]"
 	},
 	"crawler": {
-		"save_html": [Whether to store the original HTML (true) or not (false)],
-		"agents": [Amount of agents],
-		"critical_db_size": [The size of the DB file in MB, at which the crawler will stop],
-		"db_size_milestone": [The size of the DB file in MB, at which the monitors make an annoucement],
-		"crawl_milestone": [The amount of HTML in MB to crawl, at which the monitors make an announcement]
+		"save_html": "[Whether to store the original HTML (true) or not (false)]",
+		"agents": "[Amount of agents]",
+		"critical_db_size": "[The size of the DB file in MB, at which the crawler will stop]",
+		"db_size_milestone": "[The size of the DB file in MB, at which the monitors make an annoucement]",
+		"crawl_milestone": "[The amount of HTML in MB to crawl, at which the monitors make an announcement]"
 	}
 }
 ```
