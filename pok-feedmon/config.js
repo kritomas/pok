@@ -1,6 +1,6 @@
-import { readFileSync } from 'fs';
+import { readFileSync } from "fs";
 
-const CONFIG_LOCATION = "config.json"
+const CONFIG_LOCATION = "/usr/local/etc/pok.json"
 
 export const conf = JSON.parse(readFileSync(CONFIG_LOCATION))
 if (conf.db == undefined)

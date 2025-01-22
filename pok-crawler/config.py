@@ -1,6 +1,6 @@
 import json, numbers
 
-CONFIG_LOCATION = "config.json"
+CONFIG_LOCATION = "/usr/local/etc/pok.json"
 
 with open(CONFIG_LOCATION) as file:
 	conf = json.load(file)

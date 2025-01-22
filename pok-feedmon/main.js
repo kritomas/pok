@@ -10,7 +10,7 @@ const PORT = 8080;
 const app = express();
 const server = http.createServer(app);
 
-app.use(express.static("./atomon/dist"));
+app.use(express.static("/var/pok/pok-feedmon/dist"));
 
 const db = new DBConnection();
 
