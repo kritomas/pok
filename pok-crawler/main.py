@@ -1,4 +1,4 @@
-import signal, gc
+import signal, gc, time
 import config, dbctl, agent, master, activator, deactivator
 
 class SigTermException(Exception):
@@ -29,11 +29,13 @@ try:
 	while connection.active():
 		time.sleep(1)
 except KeyboardInterrupt:
+	signal.signal(signal.SIGINT, signal.SIG_IGN)
+	signal.signal(signal.SIGTERM, signal.SIG_IGN)
 	log("Caught SIGINT, terminating")
 except SigTermException:
+	signal.signal(signal.SIGTERM, signal.SIG_IGN)
+	signal.signal(signal.SIGINT, signal.SIG_IGN)
 	log("Caught SIGTERM, terminating")
-signal.signal(signal.SIGINT, signal.SIG_IGN)
-signal.signal(signal.SIGTERM, signal.SIG_IGN)
 del connection
 gc.collect()
 dea = deactivator.Deactivator()

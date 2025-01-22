@@ -1,4 +1,4 @@
-import multiprocessing, urllib.parse, signal
+import multiprocessing, urllib.parse, signal, time
 import requests, bs4, sqlite3
 import dbctl
 

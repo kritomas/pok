@@ -1,4 +1,4 @@
-import multiprocessing, signal
+import multiprocessing, signal, time
 import dbctl
 
 class Deactivator(multiprocessing.Process):
