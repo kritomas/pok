@@ -1,0 +1,9 @@
+[Unit]
+Description=Pok Webcrawler
+
+[Service]
+Type=simple
+ExecStart=/var/pok/pok-crawler/start-crawler.sh
+
+[Install]
+WantedBy=multi-user.target

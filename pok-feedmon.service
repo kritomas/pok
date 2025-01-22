@@ -1,0 +1,9 @@
+[Unit]
+Description=Pok Atom Feed Monitor
+
+[Service]
+Type=simple
+ExecStart=/var/pok/pok-feedmon/start-feedmon.sh
+
+[Install]
+WantedBy=multi-user.target
