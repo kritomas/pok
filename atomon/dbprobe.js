@@ -1,3 +1,4 @@
+import { statSync } from "fs";
 import sqlite3 from "sqlite3";
 
 import { conf } from "./config.js";
@@ -25,4 +26,9 @@ export function DBConnection()
 	{
 		return (await this.fetchFirst("select sum(original_size) as total from Site;")).total;
 	}
+}
+
+export function dbFileSize()
+{
+	return statSync(conf.db.db_path).size;
 }

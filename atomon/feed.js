@@ -8,7 +8,7 @@ const FEED_TEMPLATE_LOCATION = "atomon/atom-template.xml";
 const parser = new DOMParser();
 const serializer = new XMLSerializer();
 
-function reset()
+export function resetQuiet()
 {
 	let raw = "" + readFileSync(FEED_TEMPLATE_LOCATION);
 	let xml = parser.parseFromString(raw);
@@ -32,7 +32,7 @@ export function addAutomatedEntry(title, content)
 
 	let author = xml.createElement("author");
 	let authorName = xml.createElement("name");
-	authorName.textContent = "Pok Atom Feed Monitor";
+	authorName.textContent = "Pok Automatic Feed Updater";
 	author.appendChild(authorName)
 	entry.appendChild(author);
 
@@ -55,11 +55,17 @@ export function addAutomatedEntry(title, content)
 	writeFileSync(FEED_LOCATION, serializer.serializeToString(xml));
 }
 
+export function reset()
+{
+	resetQuiet();
+	addAutomatedEntry("Feed Reset", "The feed has been wiped.")
+}
+
 try
 {
 	let xml = readFileSync(FEED_LOCATION);
 }
 catch
 {
-	reset();
+	resetQuiet();
 }
