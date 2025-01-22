@@ -17,8 +17,8 @@ if not "crawler" in conf:
 	raise ValueError("Config entry crawler not found")
 if not "save_html" in conf["crawler"]:
 	raise ValueError("Config entry crawler.save_html not found")
-if not "processes" in conf["crawler"]:
-	raise ValueError("Config entry crawler.processes not found")
+if not "agents" in conf["crawler"]:
+	raise ValueError("Config entry crawler.agents not found")
 if not "critical_db_size" in conf["crawler"]:
 	raise ValueError("Config entry crawler.critical_db_size not found")
 
@@ -28,10 +28,10 @@ if not isinstance(conf["db"]["schema_path"], str):
 	raise ValueError("Config entry db.schema_path must be a string")
 if not isinstance(conf["crawler"]["save_html"], bool):
 	raise ValueError("Config entry crawler.save_html must be an boolean")
-if not isinstance(conf["crawler"]["processes"], int):
-	raise ValueError("Config entry crawler.processes must be an integer")
-if not (conf["crawler"]["processes"] > 0):
-	raise ValueError("Config entry crawler.processes must be greater than zero")
+if not isinstance(conf["crawler"]["agents"], int):
+	raise ValueError("Config entry crawler.agents must be an integer")
+if not (conf["crawler"]["agents"] > 0):
+	raise ValueError("Config entry crawler.agents must be greater than zero")
 if not isinstance(conf["crawler"]["critical_db_size"], numbers.Number):
 	raise ValueError("Config entry crawler.critical_db_size must be a number")
 if not (conf["crawler"]["critical_db_size"] > 0):

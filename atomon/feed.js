@@ -24,6 +24,8 @@ export function addAutomatedEntry(title, content)
 	let raw = "" + readFileSync(FEED_TEMPLATE_LOCATION);
 	let xml = parser.parseFromString(raw);
 
+	xml.getElementsByTagName("updated")[0].textContent = new Date().toISOString();
+
 	let entry = xml.createElement("entry")
 
 	let titleElement = xml.createElement("title");

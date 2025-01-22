@@ -34,15 +34,18 @@ server.listen(PORT, async () =>
 
 		if (thresholds.get("crawl_milestone") && !thresholds_old.get("crawl_milestone"))
 		{
+			console.log("Crawl milestone reached");
 			addAutomatedEntry("Crawl milestone reached", "Pok has reached the specified milestone of " + bToMb(conf.crawler.crawl_milestone) + " articles crawled.");
 		}
 		if (thresholds.get("db_size_milestone") && !thresholds_old.get("db_size_milestone"))
 		{
+			console.log("Database milestone reached");
 			addAutomatedEntry("Database milestone reached", "Pok's database has reached the specified milestone of " + bToMb(conf.crawler.db_size_milestone) + " total in size.");
 		}
 		if (thresholds.get("critical_db_size") && !thresholds_old.get("critical_db_size"))
 		{
-			addAutomatedEntry("Critical database size", "Pok's database has reached the specified critical size of " + bToMb(conf.crawler.critical_db_size) + " total in size, Pok terminating.");
+			console.log("Critical database size reached");
+			addAutomatedEntry("Critical database size reached", "Pok's database has reached the specified critical size of " + bToMb(conf.crawler.critical_db_size) + " total in size, Pok terminating.");
 		}
 	}, 5000);
 

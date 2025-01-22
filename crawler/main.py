@@ -1,4 +1,4 @@
-import signal
+import signal, gc
 import config, dbctl, agent, master, activator, deactivator
 
 class SigTermException(Exception):
@@ -16,7 +16,7 @@ m.start()
 
 agents = []
 
-for i in range(config.conf["crawler"]["processes"]):
+for i in range(config.conf["crawler"]["agents"]):
 	agents.append(agent.Agent(i))
 for a in agents:
 	a.start()
@@ -32,6 +32,8 @@ except KeyboardInterrupt:
 	log("Caught SIGINT, terminating")
 except SigTermException:
 	log("Caught SIGTERM, terminating")
+del connection
+gc.collect()
 dea = deactivator.Deactivator()
 dea.start()
 signal.signal(signal.SIGINT, signal.SIG_IGN)

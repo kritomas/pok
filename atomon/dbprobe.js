@@ -1,7 +1,12 @@
-import { statSync } from "fs";
+import { statSync, existsSync } from "fs";
 import sqlite3 from "sqlite3";
 
 import { conf } from "./config.js";
+
+if (!existsSync(conf.db.db_path))
+{
+	throw Error("Database not found");
+}
 
 export function DBConnection()
 {
@@ -24,7 +29,12 @@ export function DBConnection()
 
 	this.totalCrawledSize = async () =>
 	{
-		return (await this.fetchFirst("select sum(original_size) as total from Site;")).total;
+		let result = (await this.fetchFirst("select sum(original_size) as total from Site;")).total
+		if (result === null)
+		{
+			return 0
+		}
+		return result;
 	}
 }
 

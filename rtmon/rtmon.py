@@ -51,6 +51,8 @@ class DBConnection:
 		with DBContext() as cursor:
 			cursor.execute("select sum(original_size) as total from Site;")
 			row = cursor.fetchone()
+			if row[0] == None:
+				return 0
 			return row[0]
 
 dbcon = DBConnection()
@@ -97,9 +99,20 @@ def main():
 				time.sleep(3)
 				print("\33[4A", end="")
 		print()
-		print("\33[32mCritical target reached, Pok terminating ;)")
+		print("\33[32mCritical target reached ;)")
+		print("\33[0m", end="")
+		while True:
+			time.sleep(5)
 	except KeyboardInterrupt:
 		pass
+	except FileNotFoundError:
+		print("\33[31mERROR: Database not found")
+		print("\33[0m", end="")
+		try:
+			while True:
+				time.sleep(5)
+		except KeyboardInterrupt:
+			pass
 	print("\33[0mExiting Pok Realtime Monitor")
 
 main()
