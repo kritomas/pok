@@ -30,7 +30,7 @@ server.listen(PORT, async () =>
 
 		if (thresholds.get("crawl_milestone") && !thresholds_old.get("crawl_milestone"))
 		{
-			addAutomatedEntry("Crawl milestone reached", "Pok has reached the specified milestone of " + bToMb(await db.totalCrawledSize()) + " articles crawled");
+			addAutomatedEntry("Crawl milestone reached", "Pok has reached the specified milestone of " + bToMb(conf.crawler.crawl_milestone) + " articles crawled");
 		}
 	}, 5000);
 

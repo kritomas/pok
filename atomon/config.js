@@ -54,4 +54,6 @@ if (conf.crawler.crawl_milestone <= 0)
 	throw new Error("Config entry crawler.crawl_milestone must be positive");
 }
 
-conf.crawler.crawl_milestone = Math.round(conf.crawler.critical_db_size * 1024 * 1024)
+conf.crawler.critical_db_size = Math.round(conf.crawler.critical_db_size * 1024 * 1024)
+conf.crawler.db_size_milestone = Math.round(conf.crawler.db_size_milestone * 1024 * 1024)
+conf.crawler.crawl_milestone = Math.round(conf.crawler.crawl_milestone * 1024 * 1024)

@@ -3,7 +3,7 @@ import { DOMParser, XMLSerializer } from "xmldom";
 import { v4 as uuidv4 } from "uuid";
 
 const FEED_LOCATION = "atomon/dist/pok.atom";
-const FEED_TEMPLATE_LOCATION = "atomon/dist/atom-template.xml";
+const FEED_TEMPLATE_LOCATION = "atomon/atom-template.xml";
 
 const parser = new DOMParser();
 const serializer = new XMLSerializer();
@@ -57,7 +57,7 @@ export function addAutomatedEntry(title, content)
 
 try
 {
-	let xml = readFileSync(CONFIG_LOCATION);
+	let xml = readFileSync(FEED_LOCATION);
 }
 catch
 {
