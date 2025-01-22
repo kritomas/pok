@@ -82,10 +82,11 @@ class Agent(multiprocessing.Process):
 			try:
 				if not self.connection.alreadyCrawled(currentLink):
 					response = requests.get(currentLink, cookies=_cookies)
-					soup = bs4.BeautifulSoup(response.text, "html.parser")
-					nextLinks = []
-					for next in soup.find_all("a", href=True):
-						nextLinks.append(next["href"])
+					soup = bs4.BeautifulSoup(response.text, "lxml")
+					rawLinks = soup.find_all("a", href=True)
+					nextLinks = [None] * len(rawLinks)
+					for index in range(0, len(rawLinks)):
+						nextLinks[index] = rawLinks[index]["href"]
 					self.processNextLinks(nextLinks)
 					self.connection.addCrawl(currentLink, response.text, self.parseSoup(soup))
 					#self.connection.addCrawlHtmlOnly(currentLink, response.text)

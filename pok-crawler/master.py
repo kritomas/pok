@@ -1,4 +1,4 @@
-import multiprocessing, signal, os
+import multiprocessing, signal, os, time
 import dbctl, config
 
 class Master(multiprocessing.Process):
@@ -17,6 +17,7 @@ class Master(multiprocessing.Process):
 				if os.path.getsize(config.conf["db"]["db_path"]) > config.conf["crawler"]["critical_db_size"]:
 					self.log("Critical size reached")
 					self.connection.deactivate()
+				time.sleep(2)
 			except Exception as error:
 				self.log("Exception: " + str(error))
 		self.log("Terminating")

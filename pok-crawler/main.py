@@ -27,7 +27,7 @@ def log(what):
 try:
 	connection = dbctl.DBController()
 	while connection.active():
-		pass
+		time.sleep(1)
 except KeyboardInterrupt:
 	log("Caught SIGINT, terminating")
 except SigTermException:

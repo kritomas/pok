@@ -14,4 +14,5 @@ class Activator(multiprocessing.Process):
 		self.connection = dbctl.DBController()
 		while not self.connection.active():
 			self.connection.activate()
+			time.sleep(0.1)
 		self.log("DB ready for agents")

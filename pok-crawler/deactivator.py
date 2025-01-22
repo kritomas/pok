@@ -14,4 +14,5 @@ class Deactivator(multiprocessing.Process):
 		self.connection = dbctl.DBController()
 		while self.connection.active():
 			self.connection.deactivate()
+			time.sleep(0.1)
 		self.log("DB closed, agents terminating")
