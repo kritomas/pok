@@ -32,12 +32,12 @@ except KeyboardInterrupt:
 	log("Caught SIGINT, terminating")
 except SigTermException:
 	log("Caught SIGTERM, terminating")
+signal.signal(signal.SIGINT, signal.SIG_IGN)
+signal.signal(signal.SIGTERM, signal.SIG_IGN)
 del connection
 gc.collect()
 dea = deactivator.Deactivator()
 dea.start()
-signal.signal(signal.SIGINT, signal.SIG_IGN)
-signal.signal(signal.SIGTERM, signal.SIG_IGN)
 dea.join()
 log("Waiting for agents to terminate")
 for a in agents:

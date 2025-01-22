@@ -29,6 +29,10 @@ class Agent(multiprocessing.Process):
 		next = urllib.parse.urljoin(self.connection.baseUrl(), link)
 		#if self.scannable(next):
 		self.connection.addLink(next)
+	def processNextLinks(self, links):
+		for link in links:
+			link = urllib.parse.urljoin(self.connection.baseUrl(), link)
+		self.connection.addLinks(links)
 
 	def parseSoup(self, soup):
 		title = soup.find("meta", attrs={"property":"og:title"})
@@ -79,8 +83,10 @@ class Agent(multiprocessing.Process):
 				if not self.connection.alreadyCrawled(currentLink):
 					response = requests.get(currentLink, cookies=_cookies)
 					soup = bs4.BeautifulSoup(response.text, "html.parser")
+					nextLinks = []
 					for next in soup.find_all("a", href=True):
-						self.processNextLink(next["href"])
+						nextLinks.append(next["href"])
+					self.processNextLinks(nextLinks)
 					self.connection.addCrawl(currentLink, response.text, self.parseSoup(soup))
 					#self.connection.addCrawlHtmlOnly(currentLink, response.text)
 			except sqlite3.IntegrityError as error:

@@ -99,6 +99,15 @@ class DBConnection:
 			if row == None:
 				cursor.execute("insert into Links_To_Check (link) values (?);", (link,))
 			cursor.execute("commit;")
+	def addLinks(self, links):
+		with DBContext() as cursor:
+			cursor.execute("begin transaction;")
+			for link in links:
+				cursor.execute("select link from Links_To_Check where link=?;", (link,))
+				row = cursor.fetchone()
+				if row == None:
+					cursor.execute("insert into Links_To_Check (link) values (?);", (link,))
+			cursor.execute("commit;")
 	def addCrawl(self, link, html, object):
 		with DBContext() as cursor:
 			cursor.execute("begin transaction;")
