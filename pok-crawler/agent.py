@@ -89,18 +89,12 @@ class Agent(multiprocessing.Process):
 				currentLink = self.connection.baseUrl()
 			try:
 				if not self.connection.alreadyCrawled(currentLink):
-					self.log("Start")
 					response = requests.get(currentLink, cookies=_cookies)
-					self.log("Download")
 					tree = html.fromstring(response.text)
-					self.log("Sample")
 					rawLinks = tree.xpath('//a[@href]')
 					nextLinks = [link.get('href') for link in rawLinks]
-					self.log("Get links")
 					self.processNextLinks(nextLinks)
-					self.log("Store links")
 					self.connection.addCrawl(currentLink, response.text, self.parseTree(tree))
-					self.log("Store site")
 					#self.connection.addCrawlHtmlOnly(currentLink, response.text)
 			except sqlite3.IntegrityError as error:
 				self.log("SQLite integrity violation for '" + currentLink + "': " + str(error))

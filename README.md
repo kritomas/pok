@@ -10,7 +10,7 @@ This project is made up of three parts: the crawler itself, and two monitors.
 
 1.	Install dependencies: `python3`
 
-2.	Install python modules: `requests`, `bs4`, `sqlite3`
+2.	Install python modules: `requests`, `lxml`, `sqlite3`
 
 	**Note:** The modules have to be installed globally. If you want to use a venv, you'll have to modify the running script (`pok-crawler/start-crawler.sh`).
 
@@ -31,7 +31,7 @@ This project is made up of three parts: the crawler itself, and two monitors.
 
 1.	Install dependencies: `python3`
 
-2.	Install python modules: `requests`, `bs4`, `sqlite3`
+2.	Install python modules: `sqlite3`
 
 	**Note:** The modules have to be installed globally. If you want to use a venv, you'll have to modify the shebang in `pok-rtmon/pok-rtmon`.
 
