@@ -33,9 +33,11 @@ class Agent(multiprocessing.Process):
 		#if self.scannable(next):
 		self.connection.addLink(next)
 	def processNextLinks(self, links):
-		for link in links:
-			link = urllib.parse.urljoin(self.connection.baseUrl(), link)
-		self.connection.addLinks(links)
+		filtered = [urllib.parse.urljoin(self.connection.baseUrl(), link) for link in links if self.scannable(urllib.parse.urljoin(self.connection.baseUrl(), link))]
+		self.connection.addLinks(filtered)
+		#for link in links:
+		#	link = urllib.parse.urljoin(self.connection.baseUrl(), link)
+		#self.connection.addLinks(links)
 
 	def parseTree(self, tree):
 		# Extract the title
