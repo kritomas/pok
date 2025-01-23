@@ -2,6 +2,8 @@ import multiprocessing, urllib.parse, signal, time
 import requests, bs4, sqlite3
 import dbctl
 
+ACTIVITY_TIMEOUT = 5
+
 _cookies = {
 	"dCMP": "mafra=1111,all=1,reklama=1,part=0,cpex=1,google=1,gemius=1,id5=1,next=0000,onlajny=0000,jenzeny=0000,"
 	"databazeknih=0000,autojournal=0000,skodahome=0000,skodaklasik=0000,groupm=1,piano=1,seznam=1,geozo=0,"
@@ -75,7 +77,9 @@ class Agent(multiprocessing.Process):
 		signal.signal(signal.SIGTERM, signal.SIG_IGN)
 		self.connection = dbctl.DBConnection()
 		self.log("Initialized")
-		while self.connection.active():
+		activityTimer = self.connection.active() * ACTIVITY_TIMEOUT
+		while activityTimer > 0:
+			beginTime = time.time()
 			currentLink = self.connection.nextLink()
 			if currentLink == None:
 				currentLink = self.connection.baseUrl()
@@ -94,4 +98,7 @@ class Agent(multiprocessing.Process):
 				self.log("SQLite integrity violation for '" + currentLink + "': " + str(error))
 			except Exception as error:
 				self.log("Exception: " + str(error))
+			activityTimer -= (time.time() - beginTime)
+			if activityTimer <= 0:
+				activityTimer = self.connection.active() * ACTIVITY_TIMEOUT
 		self.log("Terminating")
