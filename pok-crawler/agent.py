@@ -1,5 +1,6 @@
 import multiprocessing, urllib.parse, signal, time
-import requests, bs4, sqlite3
+import requests, sqlite3
+from lxml import html
 import dbctl
 
 ACTIVITY_TIMEOUT = 5
@@ -36,32 +37,35 @@ class Agent(multiprocessing.Process):
 			link = urllib.parse.urljoin(self.connection.baseUrl(), link)
 		self.connection.addLinks(links)
 
-	def parseSoup(self, soup):
-		title = soup.find("meta", attrs={"property":"og:title"})
-		if title:
-			title = title["content"]
+	def parseTree(self, tree):
+		# Extract the title
+		title_meta = tree.xpath('//meta[@property="og:title"]/@content')
+		title = title_meta[0] if title_meta else None
 
+		# Extract the content
+		article_body = tree.xpath('//div[@id="art-text"]')
 		content = None
-		article_body = soup.find("div", attrs={"id":"art-text"})
 		if article_body:
-			content = "\n".join([p.get_text(strip=True) for p in soup.find("div", attrs={"id":"art-text"}).find_all("p")])
+			paragraphs = article_body[0].xpath('.//p/text()')
+			content = "\n".join([p.strip() for p in paragraphs])
 
-		date = soup.find("meta", attrs={"property":"article:published_time"})
-		if date:
-			date = date["content"]
+		# Extract the publication date
+		date_meta = tree.xpath('//meta[@property="article:published_time"]/@content')
+		date = date_meta[0] if date_meta else None
 
-		category = soup.find("meta", attrs={"name":"cXenseParse:qiw-rubrika"})
-		if category:
-			category = category["content"]
+		# Extract the category
+		category_meta = tree.xpath('//meta[@name="cXenseParse:qiw-rubrika"]/@content')
+		category = category_meta[0] if category_meta else None
 
-		comment_count = soup.find("a", attrs={"class": "artsum-btn ico-discusion"})
-		if comment_count:
-			comment_count = comment_count.find("span")
-			comment_count = comment_count.text
-			comment_count = int(comment_count.split(" ")[0][1:])
+		# Extract the comment count
+		comment_count_elem = tree.xpath('//a[@class="artsum-btn ico-discusion"]/span')
+		comment_count = None
+		if comment_count_elem:
+			comment_count_text = comment_count_elem[0].text
+			comment_count = int(comment_count_text.split(" ")[0][1:])
 
-		photo_count = len(soup.find_all('img'))
-
+		# Count the number of images
+		photo_count = len(tree.xpath('//img'))
 
 		return {
 			"title": title,
@@ -85,14 +89,18 @@ class Agent(multiprocessing.Process):
 				currentLink = self.connection.baseUrl()
 			try:
 				if not self.connection.alreadyCrawled(currentLink):
+					self.log("Start")
 					response = requests.get(currentLink, cookies=_cookies)
-					soup = bs4.BeautifulSoup(response.text, "lxml")
-					rawLinks = soup.find_all("a", href=True)
-					nextLinks = [None] * len(rawLinks)
-					for index in range(0, len(rawLinks)):
-						nextLinks[index] = rawLinks[index]["href"]
+					self.log("Download")
+					tree = html.fromstring(response.text)
+					self.log("Sample")
+					rawLinks = tree.xpath('//a[@href]')
+					nextLinks = [link.get('href') for link in rawLinks]
+					self.log("Get links")
 					self.processNextLinks(nextLinks)
-					self.connection.addCrawl(currentLink, response.text, self.parseSoup(soup))
+					self.log("Store links")
+					self.connection.addCrawl(currentLink, response.text, self.parseTree(tree))
+					self.log("Store site")
 					#self.connection.addCrawlHtmlOnly(currentLink, response.text)
 			except sqlite3.IntegrityError as error:
 				self.log("SQLite integrity violation for '" + currentLink + "': " + str(error))
