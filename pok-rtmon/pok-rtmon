@@ -3,19 +3,25 @@
 # This python script serves as a realtime monitor for pok.
 
 import os, json, numbers, time, sys
-import sqlite3
+import pgdb
 
 os.system("")
 
-CONFIG_LOCATION = "/usr/local/etc/pok.json"
+CONFIG_LOCATION = "../pok-crawler/pok.json" # "/usr/local/etc/pok.json" TODO
 
 with open(CONFIG_LOCATION) as file:
 	conf = json.load(file)
 
 if not "db" in conf:
 	raise ValueError("Config entry db not found")
-if not "db_path" in conf["db"]:
-	raise ValueError("Config entry db.db_path not found")
+if not "user" in conf["db"]:
+	raise ValueError("Config entry db.user not found")
+if not "password" in conf["db"]:
+	raise ValueError("Config entry db.password not found")
+if not "host" in conf["db"]:
+	raise ValueError("Config entry db.host not found")
+if not "database" in conf["db"]:
+	raise ValueError("Config entry db.database not found")
 if not "crawler" in conf:
 	raise ValueError("Config entry crawler not found")
 if not "critical_db_size" in conf["crawler"]:
@@ -23,8 +29,14 @@ if not "critical_db_size" in conf["crawler"]:
 if not "crawl_milestone" in conf["crawler"]:
 	raise ValueError("Config entry crawler.crawl_milestone not found")
 
-if not isinstance(conf["db"]["db_path"], str):
-	raise ValueError("Config entry db.db_path must be a string")
+if not isinstance(conf["db"]["user"], str):
+	raise ValueError("Config entry db.user must be a string")
+if not isinstance(conf["db"]["password"], str):
+	raise ValueError("Config entry db.password must be a string")
+if not isinstance(conf["db"]["host"], str):
+	raise ValueError("Config entry db.host must be a string")
+if not isinstance(conf["db"]["database"], str):
+	raise ValueError("Config entry db.database must be a string")
 if not isinstance(conf["crawler"]["critical_db_size"], numbers.Number):
 	raise ValueError("Config entry crawler.critical_db_size must be a number")
 if not (conf["crawler"]["critical_db_size"] > 0):
@@ -36,19 +48,19 @@ conf["crawler"]["db_size_milestone"] = int(conf["crawler"]["db_size_milestone"] 
 conf["crawler"]["critical_db_size"] = int(conf["crawler"]["critical_db_size"] * 1024 * 1024) # Convert from MB to B
 conf["crawler"]["crawl_milestone"] = int(conf["crawler"]["crawl_milestone"] * 1024 * 1024) # Convert from MB to B
 
-
-class DBContext:
-	def __enter__(self):
-		self.connection = sqlite3.connect(conf["db"]["db_path"], timeout=500)
-		self.cursor = self.connection.cursor()
-		return self.cursor
-	def __exit__(self, exc_type, exc_value, traceback):
-		self.connection.commit()
-		self.connection.close()
-
 class DBConnection:
+	def __init__(self):
+		self.conn = pgdb.connect(user=conf["db"]["user"], password=conf["db"]["password"], host=conf["db"]["host"], database=conf["db"]["database"])
+
+	def totalDiskSize(self):
+		with self.conn.cursor() as cursor:
+			cursor.execute("select pg_database_size('pok');")
+			row = cursor.fetchone()
+			if row[0] == None:
+				return 0
+			return row[0]
 	def totalCrawledSize(self):
-		with DBContext() as cursor:
+		with self.conn.cursor() as cursor:
 			cursor.execute("select sum(original_size) as total from Site;")
 			row = cursor.fetchone()
 			if row[0] == None:
@@ -63,12 +75,12 @@ def bToMb(b):
 def main():
 	print("Pok Realtime Monitor\n")
 	try:
-		dbFileSize = os.path.getsize(conf["db"]["db_path"])
+		dbFileSize = dbcon.totalDiskSize()
 		do = True
 		while do or dbFileSize < conf["crawler"]["critical_db_size"]:
 			do = False
 			totalCrawled = dbcon.totalCrawledSize()
-			dbFileSize = os.path.getsize(conf["db"]["db_path"])
+			dbFileSize = dbcon.totalDiskSize()
 
 			print("\33[0m\r\33[J", end="")
 
