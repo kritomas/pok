@@ -10,7 +10,7 @@ This project is made up of three parts: the crawler itself, and two monitors.
 
 1.	Install dependencies: `python3`
 
-2.	Install python modules: `requests`, `lxml`, `sqlite3`
+2.	Install python modules: `requests`, `lxml`, `pygresql`
 
 	**Note:** The modules have to be installed globally. If you want to use a venv, you'll have to modify the running script (`pok-crawler/start-crawler.sh`).
 
@@ -22,16 +22,13 @@ This project is made up of three parts: the crawler itself, and two monitors.
 
 ## Pok Atom Feed Monitor
 
-1.	Install dependencies: `nodejs`, `npm`.
-2.	Invoke `npm i` in `pok-feedmon`.
-3.	Copy all of `pok-feedmon` into `/var/pok`.
-4.	Copy `pok-feedmon.service` into `/etc/systemd/system`.
+Broken on the PostgreSQL version.
 
 ## Pok Realtime Monitor
 
 1.	Install dependencies: `python3`
 
-2.	Install python modules: `sqlite3`
+2.	Install python modules: `pygresql`
 
 	**Note:** The modules have to be installed globally. If you want to use a venv, you'll have to modify the shebang in `pok-rtmon/pok-rtmon`.
 
@@ -47,7 +44,7 @@ This project is made up of three parts: the crawler itself, and two monitors.
 
 ## Database
 
-Copy `database/init.sql` anywhere really (e.g. `/var/pok/database`), but make sure you remember where.
+Create a PostgreSQL database and invoke `database/init.sql`.
 
 # Configuration
 
@@ -56,8 +53,10 @@ Create `/usr/local/etc/pok.json` with the following format:
 ```json
 {
 	"db": {
-		"db_path": "[Path to wherever pok will keep its stuff]",
-		"schema_path": "[Path to the DB init script (wherever you copy database/init.sql to)]"
+		"user": "[DB user]",
+		"password": "[DB password]",
+		"host": "[DB server address (optionally with port)]",
+		"database": "[DB name]"
 	},
 	"crawler": {
 		"save_html": "[Whether to store the original HTML (true) or not (false)]",
@@ -81,11 +80,7 @@ Make sure you start this before the monitors.
 
 ## Pok Atom Feed Monitor
 
-Start feed monitor systemd service: `systemctl start pok-feedmon`.
-
-Add the Atom feed from `0.0.0.0:8080/pok.atom` to your favorite feed reader.
-
-You will get an update each time a milestone is reached (see config above).
+Broken on the PostgreSQL version.
 
 ## Pok Realtime Monitor
 
