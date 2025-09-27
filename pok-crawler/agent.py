@@ -1,5 +1,5 @@
 import multiprocessing, urllib.parse, signal, time
-import requests, sqlite3
+import requests, pg
 from lxml import html
 import dbctl
 
@@ -98,10 +98,9 @@ class Agent(multiprocessing.Process):
 					self.processNextLinks(nextLinks)
 					self.connection.addCrawl(currentLink, response.text, self.parseTree(tree))
 					#self.connection.addCrawlHtmlOnly(currentLink, response.text)
-			except sqlite3.IntegrityError as error:
-				self.log("SQLite integrity violation for '" + currentLink + "': " + str(error))
-			except Exception as error:
-				self.log("Exception: " + str(error))
+			except pg.Error as error:
+				self.connection.conn.rollback()
+				self.log("PostgreSQL Exception: " + str(error))
 			activityTimer -= (time.time() - beginTime)
 			if activityTimer <= 0:
 				activityTimer = self.connection.active() * ACTIVITY_TIMEOUT

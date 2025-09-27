@@ -1,18 +1,21 @@
 import json, numbers
 
-CONFIG_LOCATION = "/usr/local/etc/pok.json"
+CONFIG_LOCATION = "./pok.json" # "/usr/local/etc/pok.json" TODO
 
 with open(CONFIG_LOCATION) as file:
 	conf = json.load(file)
 
 if not "db" in conf:
 	raise ValueError("Config entry db not found")
-if not "db_path" in conf["db"]:
-	raise ValueError("Config entry db.db_path not found")
-if not "schema_path" in conf["db"]:
-	raise ValueError("Config entry db.schema_path not found")
-if not "save_html" in conf["crawler"]:
-	raise ValueError("Config entry crawler.save_html not found")
+if not "user" in conf["db"]:
+	raise ValueError("Config entry db.user not found")
+if not "password" in conf["db"]:
+	raise ValueError("Config entry db.password not found")
+if not "host" in conf["db"]:
+	raise ValueError("Config entry db.host not found")
+if not "database" in conf["db"]:
+	raise ValueError("Config entry db.database not found")
+
 if not "crawler" in conf:
 	raise ValueError("Config entry crawler not found")
 if not "save_html" in conf["crawler"]:
@@ -22,10 +25,15 @@ if not "agents" in conf["crawler"]:
 if not "critical_db_size" in conf["crawler"]:
 	raise ValueError("Config entry crawler.critical_db_size not found")
 
-if not isinstance(conf["db"]["db_path"], str):
-	raise ValueError("Config entry db.db_path must be a string")
-if not isinstance(conf["db"]["schema_path"], str):
-	raise ValueError("Config entry db.schema_path must be a string")
+if not isinstance(conf["db"]["user"], str):
+	raise ValueError("Config entry db.user must be a string")
+if not isinstance(conf["db"]["password"], str):
+	raise ValueError("Config entry db.password must be a string")
+if not isinstance(conf["db"]["host"], str):
+	raise ValueError("Config entry db.host must be a string")
+if not isinstance(conf["db"]["database"], str):
+	raise ValueError("Config entry db.database must be a string")
+
 if not isinstance(conf["crawler"]["save_html"], bool):
 	raise ValueError("Config entry crawler.save_html must be an boolean")
 if not isinstance(conf["crawler"]["agents"], int):

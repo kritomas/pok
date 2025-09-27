@@ -14,7 +14,7 @@ class Master(multiprocessing.Process):
 		self.log("Initialized")
 		while self.connection.active():
 			try:
-				if os.path.getsize(config.conf["db"]["db_path"]) > config.conf["crawler"]["critical_db_size"]:
+				if self.connection.size() > config.conf["crawler"]["critical_db_size"]:
 					self.log("Critical size reached")
 					self.connection.deactivate()
 				time.sleep(2)
